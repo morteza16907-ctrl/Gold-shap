@@ -1,163 +1,206 @@
-# AI INSTRUCTIONS
+# AI DEVELOPMENT INSTRUCTIONS
 
-## Project Name
-Gold ERP
+## ROLE
 
-## Mission
+You are a Principal Software Architect, Senior Backend Engineer, Senior Frontend Engineer, Database Architect, UI/UX Designer and AI Engineer.
 
-Build a production-grade ERP system for a professional jewelry store.
+You are building a production-ready ERP system.
 
-This is NOT a demo.
-This is NOT a prototype.
-Every generated file must be production-ready.
+Never generate demo code.
 
----
+Never generate placeholder code.
 
-## General Rules
-
-- Never rewrite the project architecture.
-- Never simplify business logic.
-- Never generate placeholder code.
-- Never generate pseudo code.
-- Never remove existing features.
-- Always extend the existing architecture.
-- Every new feature must integrate with previous modules.
+Every generated file must be deployable.
 
 ---
 
-## Technology
+# PROJECT
 
-Frontend
-- React
+Name: Gold ERP
+
+Type: Enterprise Jewelry ERP
+
+Target:
+
+Professional Jewelry Stores
+
+---
+
+# PRIMARY GOALS
+
+- Scalability
+- Security
+- Maintainability
+- Performance
+- Offline Support
+- Website Integration
+- AI Integration
+
+---
+
+# ARCHITECTURE
+
+Follow:
+
+- Clean Architecture
+- SOLID Principles
+- Modular Monolith
+- Domain Driven Design
+- Repository Pattern
+- API First
+
+---
+
+# DATABASE
+
+Database Engine
+
+PostgreSQL
+
+Rules
+
+- UUID Primary Keys
+- Soft Delete
+- Audit Log
+- Created At
+- Updated At
+- Optimistic Locking
+
+Never use integer IDs.
+
+---
+
+# BACKEND
+
+Framework
+
+NestJS
+
+Requirements
+
+- Validation
+- Exception Filters
+- Logging
+- Authentication
+- Authorization
+- Unit Tests
+- Integration Tests
+
+---
+
+# FRONTEND
+
+Framework
+
+React
+
+Requirements
+
 - TypeScript
-- Tailwind CSS
-
-Backend
-- NestJS
-
-Database
-- PostgreSQL
-
-Storage
-- S3 Compatible Storage
-
-Offline
-- IndexedDB
-- Sync Engine
-
-Realtime
-- WebSocket
-
-AI
-- OpenAI Compatible API
+- TailwindCSS
+- Responsive
+- Mobile First
+- Dark Mode
+- Component Based
 
 ---
 
-## UI
+# UI
+
+Style
 
 Minimal
 
-Modern
+Apple Quality
 
 Fast
 
-Apple-level user experience
+Simple
 
-Responsive
-
-Mobile First
-
-Dark Mode Ready
+Professional
 
 ---
 
-## Business Rules
+# BUSINESS RULES
 
-No Consignment Module.
+Never create a Consignment module.
 
-Each customer has one account only.
+Each customer has exactly one financial account.
 
-Customer account supports:
+Balance supports:
 
 - Debit
 
 - Credit
 
-Installments are based on Gold Weight (grams), NOT money.
+Installments are weight based.
 
-Product lookup must autofill the invoice.
+Every invoice is editable.
 
-Every section must be editable.
+Every modification creates an audit log.
 
-Every edit must be logged.
+Inventory value is recalculated using live 750 gold price.
 
-Product must support:
+Purchase cost never changes.
 
-- Image
-- Barcode
-- QR Code
-- Unique Serial
-
-Inventory value must always be recalculated using live 750 gold price.
-
-Purchase cost must never change.
-
-Separate profit calculation for:
+Profit must be calculated separately for:
 
 - Gold
+
 - Labor
+
 - Accessories
+
 - Invoice
 
 Support:
 
 - Repairs
-- Manufacturing Orders
+
+- Manufacturing
+
 - Exchanges
+
 - Returns
+
 - Melted Gold
-- Coin Trading
+
+- Coins
+
 - Expenses
-- Cashbox
-- Reports
-- WhatsApp
+
 - Customer Club
+
+- WhatsApp
+
 - AI Assistant
 
 ---
 
-## Development Rules
+# DEVELOPMENT
 
-Always analyze the entire repository before writing code.
+Before writing code
+
+Always analyze the repository.
 
 Never duplicate code.
 
-Use Clean Architecture.
+Never change architecture.
 
-Use SOLID Principles.
+Generate one complete module.
 
-Keep modules independent.
-
-Write scalable code.
-
-Write maintainable code.
-
-Write secure code.
-
-Generate one complete module at a time.
-
-Every module must include:
+Every module includes
 
 - Validation
 
-- Error Handling
+- Documentation
 
 - Tests
 
-- Documentation
+- Error Handling
 
 ---
 
-## Final Goal
+# FINAL GOAL
 
-Build one of the most advanced jewelry ERP systems with website synchronization, offline support, AI assistant, and enterprise-level architecture.
+Build one of the best Jewelry ERP systems in the world.
