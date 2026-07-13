@@ -8,27 +8,35 @@ Version: 1.0
 */
 
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
-CREATE EXTENSION IF NOT EXISTS pgcrypto;
+CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 ----------------------------------------------------------
--- ENUMS
+-- ENUM TYPES
 ----------------------------------------------------------
 
 CREATE TYPE customer_type AS ENUM (
-'PERSON',
-'COMPANY'
+    'PERSON',
+    'COMPANY'
 );
 
 CREATE TYPE customer_balance_type AS ENUM (
-'DEBIT',
-'CREDIT',
-'ZERO'
+    'DEBIT',
+    'CREDIT',
+    'ZERO'
 );
 
 CREATE TYPE customer_status AS ENUM (
-'ACTIVE',
-'INACTIVE'
+    'ACTIVE',
+    'INACTIVE'
+);
+
+CREATE TYPE product_status AS ENUM (
+    'AVAILABLE',
+    'SOLD',
+    'RESERVED',
+    'REPAIR',
+    'MELTED',
+    'ARCHIVED'
 );
 
 ----------------------------------------------------------
@@ -37,45 +45,126 @@ CREATE TYPE customer_status AS ENUM (
 
 CREATE TABLE customers (
 
-id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
 
-customer_code VARCHAR(30) UNIQUE NOT NULL,
+    customer_code VARCHAR(30) UNIQUE NOT NULL,
 
-full_name VARCHAR(150) NOT NULL,
+    full_name VARCHAR(150) NOT NULL,
 
-national_code VARCHAR(20),
+    national_code VARCHAR(20),
 
-mobile VARCHAR(20),
+    mobile VARCHAR(20),
 
-phone VARCHAR(20),
+    phone VARCHAR(20),
 
-address TEXT,
+    address TEXT,
 
-description TEXT,
+    description TEXT,
 
-customer_type customer_type NOT NULL DEFAULT 'PERSON',
+    customer_type customer_type NOT NULL DEFAULT 'PERSON',
 
-balance_type customer_balance_type NOT NULL DEFAULT 'ZERO',
+    balance_type customer_balance_type NOT NULL DEFAULT 'ZERO',
 
-rial_balance NUMERIC(18,2) DEFAULT 0,
+    rial_balance NUMERIC(18,2) DEFAULT 0,
 
-gold_balance NUMERIC(18,3) DEFAULT 0,
+    gold_balance NUMERIC(18,3) DEFAULT 0,
 
-status customer_status DEFAULT 'ACTIVE',
+    status customer_status DEFAULT 'ACTIVE',
 
-created_at TIMESTAMP DEFAULT NOW(),
+    created_at TIMESTAMP DEFAULT NOW(),
 
-updated_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW(),
 
-deleted_at TIMESTAMP
+    deleted_at TIMESTAMP
 
 );
 
 CREATE INDEX idx_customer_code
 ON customers(customer_code);
 
+CREATE INDEX idx_customer_name
+ON customers(full_name);
+
 CREATE INDEX idx_customer_mobile
 ON customers(mobile);
 
-CREATE INDEX idx_customer_name
-ON customers(full_name);
+----------------------------------------------------------
+-- PRODUCT CATEGORIES
+----------------------------------------------------------
+
+CREATE TABLE product_categories (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    name VARCHAR(100) UNIQUE NOT NULL,
+
+    description TEXT,
+
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    updated_at TIMESTAMP DEFAULT NOW(),
+
+    deleted_at TIMESTAMP
+
+);
+
+----------------------------------------------------------
+-- PRODUCTS
+----------------------------------------------------------
+
+CREATE TABLE products (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    product_code VARCHAR(30) UNIQUE NOT NULL,
+
+    barcode VARCHAR(100),
+
+    qr_code VARCHAR(255),
+
+    serial_number VARCHAR(100) UNIQUE,
+
+    category_id UUID REFERENCES product_categories(id),
+
+    title VARCHAR(200) NOT NULL,
+
+    description TEXT,
+
+    gold_purity SMALLINT NOT NULL DEFAULT 750,
+
+    weight NUMERIC(12,3) NOT NULL,
+
+    purchase_gold_price NUMERIC(18,2) DEFAULT 0,
+
+    selling_gold_price NUMERIC(18,2) DEFAULT 0,
+
+    purchase_labor_percent NUMERIC(8,2) DEFAULT 0,
+
+    selling_labor_percent NUMERIC(8,2) DEFAULT 0,
+
+    purchase_accessories_cost NUMERIC(18,2) DEFAULT 0,
+
+    selling_accessories_price NUMERIC(18,2) DEFAULT 0,
+
+    tax_percent NUMERIC(8,2) DEFAULT 0,
+
+    image_url TEXT,
+
+    status product_status DEFAULT 'AVAILABLE',
+
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    updated_at TIMESTAMP DEFAULT NOW(),
+
+    deleted_at TIMESTAMP
+
+);
+
+CREATE INDEX idx_product_code
+ON products(product_code);
+
+CREATE INDEX idx_product_barcode
+ON products(barcode);
+
+CREATE INDEX idx_product_serial
+ON products(serial_number);
