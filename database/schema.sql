@@ -777,3 +777,114 @@ CREATE TABLE cashbox_transactions (
 
 CREATE INDEX idx_cashbox_date
 ON cashbox_transactions(transaction_date);
+----------------------------------------------------------
+-- REPAIRS
+----------------------------------------------------------
+
+CREATE TABLE repairs (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    repair_number VARCHAR(30) UNIQUE NOT NULL,
+
+    customer_id UUID NOT NULL REFERENCES customers(id),
+
+    receive_date TIMESTAMP DEFAULT NOW(),
+
+    expected_delivery_date DATE,
+
+    delivery_date TIMESTAMP,
+
+    product_description TEXT NOT NULL,
+
+    weight NUMERIC(12,3),
+
+    repair_cost NUMERIC(18,2) DEFAULT 0,
+
+    status VARCHAR(30) DEFAULT 'RECEIVED',
+
+    description TEXT,
+
+    created_by UUID REFERENCES users(id),
+
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    updated_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_repairs_customer
+ON repairs(customer_id);
+
+----------------------------------------------------------
+-- MANUFACTURING ORDERS
+----------------------------------------------------------
+
+CREATE TABLE manufacturing_orders (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    order_number VARCHAR(30) UNIQUE NOT NULL,
+
+    customer_id UUID REFERENCES customers(id),
+
+    order_date TIMESTAMP DEFAULT NOW(),
+
+    delivery_date DATE,
+
+    gold_weight NUMERIC(12,3),
+
+    labor_percent NUMERIC(8,2),
+
+    accessories_cost NUMERIC(18,2),
+
+    deposit_amount NUMERIC(18,2) DEFAULT 0,
+
+    total_amount NUMERIC(18,2) DEFAULT 0,
+
+    status VARCHAR(30) DEFAULT 'OPEN',
+
+    description TEXT,
+
+    created_by UUID REFERENCES users(id),
+
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    updated_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_manufacturing_customer
+ON manufacturing_orders(customer_id);
+
+----------------------------------------------------------
+-- EXPENSES
+----------------------------------------------------------
+
+CREATE TABLE expenses (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    expense_date TIMESTAMP DEFAULT NOW(),
+
+    category VARCHAR(100) NOT NULL,
+
+    title VARCHAR(200) NOT NULL,
+
+    amount NUMERIC(18,2) NOT NULL,
+
+    payment_method VARCHAR(30),
+
+    description TEXT,
+
+    created_by UUID REFERENCES users(id),
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_expenses_date
+ON expenses(expense_date);
+
+CREATE INDEX idx_expenses_category
+ON expenses(category);
