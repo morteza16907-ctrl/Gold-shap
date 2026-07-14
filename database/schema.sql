@@ -888,3 +888,110 @@ ON expenses(expense_date);
 
 CREATE INDEX idx_expenses_category
 ON expenses(category);
+----------------------------------------------------------
+-- CUSTOMER CLUB
+----------------------------------------------------------
+
+CREATE TABLE customer_club (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    customer_id UUID NOT NULL REFERENCES customers(id),
+
+    points NUMERIC(18,2) DEFAULT 0,
+
+    level_name VARCHAR(50) DEFAULT 'Bronze',
+
+    total_purchase NUMERIC(18,2) DEFAULT 0,
+
+    total_gold_weight NUMERIC(12,3) DEFAULT 0,
+
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    updated_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_customer_club_customer
+ON customer_club(customer_id);
+
+----------------------------------------------------------
+-- AUDIT LOGS
+----------------------------------------------------------
+
+CREATE TABLE audit_logs (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    user_id UUID REFERENCES users(id),
+
+    table_name VARCHAR(100) NOT NULL,
+
+    record_id UUID,
+
+    action VARCHAR(30) NOT NULL,
+
+    old_data JSONB,
+
+    new_data JSONB,
+
+    ip_address VARCHAR(100),
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_audit_logs_table
+ON audit_logs(table_name);
+
+CREATE INDEX idx_audit_logs_date
+ON audit_logs(created_at);
+
+----------------------------------------------------------
+-- FILE ATTACHMENTS
+----------------------------------------------------------
+
+CREATE TABLE attachments (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    table_name VARCHAR(100) NOT NULL,
+
+    record_id UUID NOT NULL,
+
+    file_name VARCHAR(255) NOT NULL,
+
+    file_path TEXT NOT NULL,
+
+    file_type VARCHAR(100),
+
+    file_size BIGINT,
+
+    uploaded_by UUID REFERENCES users(id),
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+----------------------------------------------------------
+-- APPLICATION SETTINGS
+----------------------------------------------------------
+
+CREATE TABLE settings (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    setting_key VARCHAR(150) UNIQUE NOT NULL,
+
+    setting_value TEXT,
+
+    description TEXT,
+
+    updated_by UUID REFERENCES users(id),
+
+    updated_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_settings_key
+ON settings(setting_key);
