@@ -673,3 +673,107 @@ ON customer_transactions(customer_id);
 
 CREATE INDEX idx_customer_transactions_date
 ON customer_transactions(transaction_date);
+----------------------------------------------------------
+-- WEIGHT BASED INSTALLMENTS
+----------------------------------------------------------
+
+CREATE TABLE installment_contracts (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    contract_number VARCHAR(30) UNIQUE NOT NULL,
+
+    customer_id UUID NOT NULL REFERENCES customers(id),
+
+    sales_invoice_id UUID REFERENCES sales_invoices(id),
+
+    contract_date TIMESTAMP DEFAULT NOW(),
+
+    total_gold_weight NUMERIC(12,3) NOT NULL,
+
+    delivered_gold_weight NUMERIC(12,3) DEFAULT 0,
+
+    remaining_gold_weight NUMERIC(12,3) NOT NULL,
+
+    installment_count INTEGER NOT NULL,
+
+    first_due_date DATE,
+
+    status VARCHAR(30) DEFAULT 'ACTIVE',
+
+    description TEXT,
+
+    created_by UUID REFERENCES users(id),
+
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    updated_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_installment_customer
+ON installment_contracts(customer_id);
+
+----------------------------------------------------------
+-- INSTALLMENT ITEMS
+----------------------------------------------------------
+
+CREATE TABLE installment_items (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    contract_id UUID NOT NULL REFERENCES installment_contracts(id) ON DELETE CASCADE,
+
+    installment_no INTEGER NOT NULL,
+
+    due_date DATE NOT NULL,
+
+    gold_weight NUMERIC(12,3) NOT NULL,
+
+    paid_gold_weight NUMERIC(12,3) DEFAULT 0,
+
+    remaining_gold_weight NUMERIC(12,3) DEFAULT 0,
+
+    payment_date TIMESTAMP,
+
+    status VARCHAR(30) DEFAULT 'PENDING',
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_installment_items_contract
+ON installment_items(contract_id);
+
+----------------------------------------------------------
+-- CASHBOX
+----------------------------------------------------------
+
+CREATE TABLE cashbox_transactions (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    transaction_date TIMESTAMP DEFAULT NOW(),
+
+    transaction_type VARCHAR(30) NOT NULL,
+
+    payment_method VARCHAR(30) NOT NULL,
+
+    amount NUMERIC(18,2) DEFAULT 0,
+
+    gold_weight NUMERIC(12,3) DEFAULT 0,
+
+    reference_type VARCHAR(30),
+
+    reference_id UUID,
+
+    description TEXT,
+
+    created_by UUID REFERENCES users(id),
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_cashbox_date
+ON cashbox_transactions(transaction_date);
