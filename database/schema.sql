@@ -168,3 +168,72 @@ ON products(barcode);
 
 CREATE INDEX idx_product_serial
 ON products(serial_number);
+----------------------------------------------------------
+-- PRODUCT IMAGES
+----------------------------------------------------------
+
+CREATE TABLE product_images (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    product_id UUID NOT NULL REFERENCES products(id) ON DELETE CASCADE,
+
+    image_url TEXT NOT NULL,
+
+    sort_order INTEGER DEFAULT 1,
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+----------------------------------------------------------
+-- INVENTORY
+----------------------------------------------------------
+
+CREATE TABLE inventory (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    product_id UUID UNIQUE NOT NULL REFERENCES products(id),
+
+    quantity INTEGER DEFAULT 1,
+
+    available_weight NUMERIC(12,3) NOT NULL,
+
+    purchase_value NUMERIC(18,2) DEFAULT 0,
+
+    market_value NUMERIC(18,2) DEFAULT 0,
+
+    gold_difference NUMERIC(12,3) DEFAULT 0,
+
+    location VARCHAR(100),
+
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    updated_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_inventory_product
+ON inventory(product_id);
+
+----------------------------------------------------------
+-- GOLD PRICE HISTORY
+----------------------------------------------------------
+
+CREATE TABLE gold_price_history (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    price_750 NUMERIC(18,2) NOT NULL,
+
+    price_999 NUMERIC(18,2),
+
+    source VARCHAR(100),
+
+    created_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_gold_price_date
+ON gold_price_history(created_at);
