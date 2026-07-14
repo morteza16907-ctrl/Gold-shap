@@ -155,3 +155,81 @@ ON manufacturing_orders
 FOR EACH ROW
 
 EXECUTE FUNCTION update_updated_at_column();
+----------------------------------------------------------
+-- PRODUCT STATUS AFTER SALE
+----------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION mark_product_as_sold()
+
+RETURNS TRIGGER
+AS
+$$
+BEGIN
+
+UPDATE products
+
+SET
+    status='SOLD',
+    updated_at=NOW()
+
+WHERE id=NEW.product_id;
+
+RETURN NEW;
+
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_product_after_sale
+
+AFTER INSERT
+ON sales_invoice_items
+
+FOR EACH ROW
+
+EXECUTE FUNCTION mark_product_as_sold();
+----------------------------------------------------------
+-- CREATE INVENTORY AFTER PRODUCT INSERT
+----------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION create_inventory_record()
+
+RETURNS TRIGGER
+AS
+$$
+BEGIN
+
+INSERT INTO inventory(
+
+product_id,
+quantity,
+available_weight,
+purchase_value,
+market_value
+
+)
+
+VALUES(
+
+NEW.id,
+1,
+NEW.weight,
+0,
+0
+
+);
+
+RETURN NEW;
+
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_create_inventory
+
+AFTER INSERT
+ON products
+
+FOR EACH ROW
+
+EXECUTE FUNCTION create_inventory_record();
