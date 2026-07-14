@@ -419,3 +419,72 @@ ON users(username);
 
 CREATE INDEX idx_users_mobile
 ON users(mobile);
+
+----------------------------------------------------------
+-- GOLD PURCHASES
+----------------------------------------------------------
+
+CREATE TABLE gold_purchases (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    purchase_number VARCHAR(30) UNIQUE NOT NULL,
+
+    customer_id UUID NOT NULL REFERENCES customers(id),
+
+    purchase_date TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    gold_price NUMERIC(18,2) NOT NULL,
+
+    total_weight NUMERIC(12,3) NOT NULL,
+
+    total_amount NUMERIC(18,2) NOT NULL,
+
+    paid_amount NUMERIC(18,2) DEFAULT 0,
+
+    remaining_amount NUMERIC(18,2) DEFAULT 0,
+
+    remaining_weight NUMERIC(12,3) DEFAULT 0,
+
+    description TEXT,
+
+    created_by UUID REFERENCES users(id),
+
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    updated_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_gold_purchase_customer
+ON gold_purchases(customer_id);
+
+CREATE INDEX idx_gold_purchase_date
+ON gold_purchases(purchase_date);
+
+----------------------------------------------------------
+-- GOLD PURCHASE ITEMS
+----------------------------------------------------------
+
+CREATE TABLE gold_purchase_items (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    purchase_id UUID NOT NULL REFERENCES gold_purchases(id) ON DELETE CASCADE,
+
+    product_id UUID REFERENCES products(id),
+
+    weight NUMERIC(12,3) NOT NULL,
+
+    gold_price NUMERIC(18,2) NOT NULL,
+
+    labor_percent NUMERIC(8,2) DEFAULT 0,
+
+    accessories_cost NUMERIC(18,2) DEFAULT 0,
+
+    total_price NUMERIC(18,2) NOT NULL
+
+);
+
+CREATE INDEX idx_gold_purchase_items_purchase
+ON gold_purchase_items(purchase_id);
