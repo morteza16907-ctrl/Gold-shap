@@ -488,3 +488,87 @@ CREATE TABLE gold_purchase_items (
 
 CREATE INDEX idx_gold_purchase_items_purchase
 ON gold_purchase_items(purchase_id);
+
+----------------------------------------------------------
+-- SALES INVOICES
+----------------------------------------------------------
+
+CREATE TABLE sales_invoices (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    invoice_number VARCHAR(30) UNIQUE NOT NULL,
+
+    customer_id UUID NOT NULL REFERENCES customers(id),
+
+    invoice_date TIMESTAMP NOT NULL DEFAULT NOW(),
+
+    gold_price NUMERIC(18,2) NOT NULL,
+
+    total_gold_amount NUMERIC(18,2) DEFAULT 0,
+
+    total_labor_amount NUMERIC(18,2) DEFAULT 0,
+
+    total_accessories_amount NUMERIC(18,2) DEFAULT 0,
+
+    discount_amount NUMERIC(18,2) DEFAULT 0,
+
+    tax_amount NUMERIC(18,2) DEFAULT 0,
+
+    final_amount NUMERIC(18,2) NOT NULL,
+
+    paid_amount NUMERIC(18,2) DEFAULT 0,
+
+    remaining_amount NUMERIC(18,2) DEFAULT 0,
+
+    description TEXT,
+
+    created_by UUID REFERENCES users(id),
+
+    created_at TIMESTAMP DEFAULT NOW(),
+
+    updated_at TIMESTAMP DEFAULT NOW()
+
+);
+
+CREATE INDEX idx_sales_customer
+ON sales_invoices(customer_id);
+
+CREATE INDEX idx_sales_date
+ON sales_invoices(invoice_date);
+
+----------------------------------------------------------
+-- SALES INVOICE ITEMS
+----------------------------------------------------------
+
+CREATE TABLE sales_invoice_items (
+
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    invoice_id UUID NOT NULL REFERENCES sales_invoices(id) ON DELETE CASCADE,
+
+    product_id UUID NOT NULL REFERENCES products(id),
+
+    weight NUMERIC(12,3) NOT NULL,
+
+    gold_price NUMERIC(18,2) NOT NULL,
+
+    purchase_labor_percent NUMERIC(8,2) DEFAULT 0,
+
+    selling_labor_percent NUMERIC(8,2) DEFAULT 0,
+
+    purchase_accessories_price NUMERIC(18,2) DEFAULT 0,
+
+    selling_accessories_price NUMERIC(18,2) DEFAULT 0,
+
+    tax_percent NUMERIC(8,2) DEFAULT 0,
+
+    line_total NUMERIC(18,2) NOT NULL
+
+);
+
+CREATE INDEX idx_sales_items_invoice
+ON sales_invoice_items(invoice_id);
+
+CREATE INDEX idx_sales_items_product
+ON sales_invoice_items(product_id);
