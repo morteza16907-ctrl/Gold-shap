@@ -233,3 +233,112 @@ ON products
 FOR EACH ROW
 
 EXECUTE FUNCTION create_inventory_record();
+----------------------------------------------------------
+-- UPDATE CUSTOMER BALANCE AFTER PAYMENT
+----------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION update_customer_balance_after_payment()
+
+RETURNS TRIGGER
+AS
+$$
+BEGIN
+
+IF NEW.amount > 0 THEN
+
+UPDATE customers
+
+SET
+
+rial_balance = rial_balance - NEW.amount,
+
+updated_at = NOW()
+
+WHERE id = NEW.customer_id;
+
+END IF;
+
+IF NEW.gold_weight > 0 THEN
+
+UPDATE customers
+
+SET
+
+gold_balance = gold_balance - NEW.gold_weight,
+
+updated_at = NOW()
+
+WHERE id = NEW.customer_id;
+
+END IF;
+
+RETURN NEW;
+
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_update_customer_balance_after_payment
+
+AFTER INSERT
+ON payments
+
+FOR EACH ROW
+
+EXECUTE FUNCTION update_customer_balance_after_payment();
+
+----------------------------------------------------------
+-- UPDATE CUSTOMER CLUB AFTER SALE
+----------------------------------------------------------
+
+CREATE OR REPLACE FUNCTION update_customer_club_after_sale()
+
+RETURNS TRIGGER
+AS
+$$
+BEGIN
+
+INSERT INTO customer_club(
+
+customer_id,
+points,
+total_purchase,
+total_gold_weight
+
+)
+
+VALUES(
+
+NEW.customer_id,
+NEW.final_amount / 100000,
+NEW.final_amount,
+0
+
+)
+
+ON CONFLICT (customer_id)
+
+DO UPDATE
+
+SET
+
+points = customer_club.points + (NEW.final_amount / 100000),
+
+total_purchase = customer_club.total_purchase + NEW.final_amount,
+
+updated_at = NOW();
+
+RETURN NEW;
+
+END;
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER trg_customer_club_after_sale
+
+AFTER INSERT
+ON sales_invoices
+
+FOR EACH ROW
+
+EXECUTE FUNCTION update_customer_club_after_sale();
