@@ -1,101 +1,80 @@
-----------------------------------------------------------
--- CALCULATE LABOR PROFIT
-----------------------------------------------------------
-
-CREATE OR REPLACE FUNCTION calculate_labor_profit(
-
-purchase_percent NUMERIC,
-selling_percent NUMERIC,
-gold_amount NUMERIC
-
-)
-
-RETURNS NUMERIC
-
-AS
-$$
-
-BEGIN
-
-RETURN
-
-((selling_percent - purchase_percent) / 100) * gold_amount;
-
-END;
-
-$$
-LANGUAGE plpgsql IMMUTABLE;
+/*
+=========================================================
+Gold ERP
+Enterprise Jewelry ERP
+Database Views
+Version: 1.0
+=========================================================
+*/
 
 ----------------------------------------------------------
--- CALCULATE ACCESSORY PROFIT
+-- CUSTOMER BALANCES
 ----------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION calculate_accessory_profit(
+CREATE OR REPLACE VIEW vw_customer_balances AS
 
-purchase_price NUMERIC,
-selling_price NUMERIC
+SELECT
 
-)
+customer_code,
 
-RETURNS NUMERIC
+full_name,
 
-AS
-$$
+mobile,
 
-BEGIN
+balance_type,
 
-RETURN selling_price - purchase_price;
+rial_balance,
 
-END;
+gold_balance,
 
-$$
-LANGUAGE plpgsql IMMUTABLE;
+status
 
-----------------------------------------------------------
--- CALCULATE TAX AMOUNT
-----------------------------------------------------------
-
-CREATE OR REPLACE FUNCTION calculate_tax_amount(
-
-base_amount NUMERIC,
-tax_percent NUMERIC
-
-)
-
-RETURNS NUMERIC
-
-AS
-$$
-
-BEGIN
-
-RETURN (base_amount * tax_percent) / 100;
-
-END;
-
-$$
-LANGUAGE plpgsql IMMUTABLE;
+FROM customers;
 
 ----------------------------------------------------------
--- CALCULATE CUSTOMER CLUB POINTS
+-- AVAILABLE PRODUCTS
 ----------------------------------------------------------
 
-CREATE OR REPLACE FUNCTION calculate_customer_points(
+CREATE OR REPLACE VIEW vw_available_products AS
 
-invoice_amount NUMERIC
+SELECT
 
-)
+p.id,
 
-RETURNS NUMERIC
+p.product_code,
 
-AS
-$$
+p.title,
 
-BEGIN
+p.weight,
 
-RETURN FLOOR(invoice_amount / 100000);
+p.gold_purity,
 
-END;
+p.selling_gold_price,
 
-$$
-LANGUAGE plpgsql IMMUTABLE;
+p.selling_labor_percent,
+
+p.selling_accessories_price,
+
+p.status
+
+FROM products p
+
+WHERE p.status = 'AVAILABLE';
+
+----------------------------------------------------------
+-- INVENTORY SUMMARY
+----------------------------------------------------------
+
+CREATE OR REPLACE VIEW vw_inventory_summary AS
+
+SELECT
+
+COUNT(*) AS total_products,
+
+SUM(weight) AS total_weight,
+
+SUM(selling_gold_price) AS total_gold_value
+
+FROM products
+
+WHERE status = 'AVAILABLE';
